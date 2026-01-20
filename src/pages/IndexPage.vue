@@ -1,43 +1,35 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+    <form>
+      <q-input v-model="todoText" autogrow></q-input>
+    </form>
+    <q-list>
+      <q-item v-for="todo in todos" :key="todo.id">
+        <todo-card>
+          {{ todo.content }}
+        </todo-card>
+      </q-item>
+    </q-list>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import TodoCard from 'src/components/TodoCard.vue';
 
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1',
-  },
-  {
-    id: 2,
-    content: 'ct2',
-  },
-  {
-    id: 3,
-    content: 'ct3',
-  },
-  {
-    id: 4,
-    content: 'ct4',
-  },
-  {
-    id: 5,
-    content: 'ct5',
-  },
-]);
+// TODO: TODOの追加の仕組み実装
+const todoText = ref('');
 
-const meta = ref<Meta>({
-  totalCount: 1200,
-});
+interface Todo {
+  id: number;
+  content: string;
+}
+
+function makeTodo(id: number, content: string): Todo {
+  return { id, content };
+}
+
+const defaultTodos: Todo[] = ['Todoアプリを作る', 'Quasarを勉強する'].map((e, i) => makeTodo(i, e));
+
+const todos = defaultTodos;
 </script>
