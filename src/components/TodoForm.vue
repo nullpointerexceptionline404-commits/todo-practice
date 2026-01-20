@@ -1,7 +1,9 @@
 <template>
-  <q-form @submit="addTodo">
+  <q-form @submit="addTodo" @reset="reset">
     <q-input v-model="todoText" autogrow></q-input>
     <q-btn type="submit">submit</q-btn>
+    <q-btn type="reset">reset</q-btn>
+    <q-btn type="button" @click="reset2default">to default</q-btn>
   </q-form>
   <todo-list :todos="todos" @remove="removeTodo"></todo-list>
 </template>
@@ -29,11 +31,20 @@ const maxId = computed(() => {
 function addTodo() {
   const newTodo = makeTodo(maxId.value + 1, todoText.value);
   todoText.value = '';
-  todos.value.push(newTodo);
+  todos.value = [...todos.value, newTodo];
 }
 
 function removeTodo(targetId: number) {
   const removed = todos.value.filter((e) => e.id !== targetId);
   todos.value = removed;
+}
+
+function reset() {
+  todoText.value = '';
+}
+
+function reset2default() {
+  reset();
+  todos.value = defaultTodos;
 }
 </script>
