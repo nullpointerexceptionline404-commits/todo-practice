@@ -1,8 +1,9 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <form>
+    <q-form @submit="addTodo">
       <q-input v-model="todoText" autogrow></q-input>
-    </form>
+      <q-btn type="submit">submit</q-btn>
+    </q-form>
     <q-list>
       <q-item v-for="todo in todos" :key="todo.id">
         <todo-card>
@@ -14,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import TodoCard from 'src/components/TodoCard.vue';
 
 // TODO: TODOの追加の仕組み実装
@@ -31,5 +32,16 @@ function makeTodo(id: number, content: string): Todo {
 
 const defaultTodos: Todo[] = ['Todoアプリを作る', 'Quasarを勉強する'].map((e, i) => makeTodo(i, e));
 
-const todos = defaultTodos;
+const todos = ref(defaultTodos);
+
+const maxId = computed(() => {
+  const ids = todos.value.map((e) => e.id);
+  return Math.max(...ids);
+});
+
+function addTodo() {
+  const newTodo = makeTodo(maxId.value + 1, todoText.value);
+  todoText.value = '';
+  todos.value.push(newTodo);
+}
 </script>
