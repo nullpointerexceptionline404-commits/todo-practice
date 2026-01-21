@@ -5,7 +5,11 @@
     <q-btn type="reset">reset</q-btn>
     <q-btn type="button" @click="reset2default">to default</q-btn>
   </q-form>
-  <todo-list :todos="todos" @remove="removeTodo"></todo-list>
+  <todo-list
+    :todos="todos"
+    @remove="removeTodo"
+    @toggle-done="(id, next) => toggleDone(id, next)"
+  ></todo-list>
 </template>
 
 <script setup lang="ts">
@@ -16,7 +20,7 @@ import TodoList from './TodoList.vue';
 const todoText = ref('');
 
 function makeTodo(id: number, content: string): Todo {
-  return { id, content };
+  return { id, content, done: false };
 }
 
 const defaultTodos: Todo[] = ['Todoアプリを作る', 'Quasarを勉強する'].map((e, i) => makeTodo(i, e));
@@ -46,5 +50,14 @@ function reset() {
 function reset2default() {
   reset();
   todos.value = defaultTodos;
+}
+
+function toggleDone(id: number, next: boolean) {
+  const nextTodos = todos.value.map((e) => {
+    if (e.id !== id) return e;
+    const toggled = { ...e, done: next };
+    return toggled;
+  });
+  todos.value = nextTodos;
 }
 </script>
