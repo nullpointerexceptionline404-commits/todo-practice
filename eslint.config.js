@@ -78,6 +78,9 @@ export default defineConfigWithVueTs(
       },
     },
   },
+  {
+    ignorePatterns: ['pseudo/**'],
+  },
 
   prettierSkipFormatting,
 );
