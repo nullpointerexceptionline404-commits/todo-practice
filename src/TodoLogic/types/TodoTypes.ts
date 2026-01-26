@@ -18,7 +18,11 @@ export interface TodoValues4DB extends DocumentData {
 }
 
 // エンティティ
-export interface TodoValues extends TodoValues4DB {
+export interface TodoValues {
+  // TODOの内容
+  content: string;
+  // やったがtrue。初期値はfalse
+  done: boolean;
   // DBの自動的に払い出されるキー
   id: string;
 }
@@ -73,9 +77,9 @@ export interface ITodosBox {
   // ここでステート変化も行う
   initializeTodo(db: Firestore, uid: string): void;
   // 追加
-  // パラメータはすべて必要
-  // ただしIDは払い出しのため要らない
-  add(todo: Omit<TodoValues, 'id'>): Promise<void>;
+  // IDは払い出しのため要らない
+  // doneもデフォルトはfalse
+  add(content: string): Promise<void>;
   // 書き込み
   // idとその他一つがあればOK
   // mergeオプションでやる

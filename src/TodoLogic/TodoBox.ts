@@ -7,9 +7,12 @@ import type {
   TodoForUpdate,
   IQueryRefBuilder,
   TodosListener,
+  TodoValues4DB,
 } from './types/TodoTypes';
 import { addDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { QueryRefBuilder } from './QueryRefBuilder';
+
+const defaultParamTodo = { done: false } as const;
 
 export class TodoBox implements ITodosBox {
   state: DataState = 'loading';
@@ -42,8 +45,11 @@ export class TodoBox implements ITodosBox {
     });
   }
 
-  async add(todo: Omit<TodoValues, 'id'>): Promise<void> {
+  async add(content: string): Promise<void> {
     if (!this.isReady()) throw new Error('this is not ready');
+
+    const todo: TodoValues4DB = { ...defaultParamTodo, content };
+
     const ref = this.queryRefBuilder.pathAll();
     await addDoc(ref, todo);
   }
