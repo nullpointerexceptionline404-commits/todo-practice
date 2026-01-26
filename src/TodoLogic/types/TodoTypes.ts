@@ -2,11 +2,12 @@ import type {
   Firestore,
   FirestoreDataConverter,
   DocumentData,
-  Query,
   DocumentReference,
   CollectionReference,
 } from 'firebase/firestore';
 import type { Patch } from './typeutil';
+
+// privateにしたいメンバはコメントアウトしてある
 
 // これはレコードの中身なのでIDは別
 export interface TodoValues4DB extends DocumentData {
@@ -47,13 +48,11 @@ export type TodoForUpdate = Patch<TodoValues>;
 
 export type DataState = 'loading' | 'ready';
 
+export type TodosListener = (todos: TodoValues[], state: DataState) => void;
+
 // SnapShotが送られてきてない状態
 export interface ITodosBox {
-  // private
   state: DataState;
-  // privateで外には見せない
-  // initializeTodoで常に更新される
-  // todos: TodoValues[] | undefined;
   // snapshot用
   // unsubscribeFn: (() => void) | undefined;
   // クエリ投げる用
@@ -61,6 +60,8 @@ export interface ITodosBox {
   // queryRefを作る
   // 全体の場合はキャッシュを作る
   queryRefBuilder: IQueryRefBuilder | undefined;
+  // Todo変更のリスナー
+  // listeners: Set<TodosListener>;
 
   // constructor(db: Firestore): ITodosBox;
 
@@ -73,7 +74,6 @@ export interface ITodosBox {
   // snapshot変更をリッスンしたときのコールバック
   // ここでステート変化も行う
   initializeTodo(uid: string): void;
-  getTodos(): TodoValues[] | undefined;
   // 追加
   // パラメータはすべて必要
   // ただしIDは払い出しのため要らない
@@ -87,6 +87,9 @@ export interface ITodosBox {
   remove(targetId: string): Promise<void>;
   // todosの購読解除処理
   unsubscribe(): void;
+  // Todo変化購読
+  // 購読解除処理を返す
+  onChangeTodos(listener: TodosListener): () => void;
 }
 
 // Snapshotが送られてきていける状態
@@ -95,8 +98,6 @@ export interface ITodosBox {
 export interface ITodosBoxReady extends ITodosBox {
   state: 'ready';
   queryRefBuilder: IQueryRefBuilder;
-
-  getTodos(): TodoValues[];
 }
 
 // 全部静的関数でいいと思う

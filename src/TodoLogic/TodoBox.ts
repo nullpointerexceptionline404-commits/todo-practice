@@ -6,20 +6,25 @@ import type {
   TodoValues,
   TodoForUpdate,
   IQueryRefBuilder,
+  TodosListener,
 } from './types/TodoTypes';
 import { addDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { QueryRefBuilder } from './QueryRefBuilder';
 
 export class TodoBox implements ITodosBox {
   state: DataState = 'loading';
-  private todos: TodoValues[] | undefined;
   private unsubscribeFn: (() => void) | undefined;
   queryRefBuilder: IQueryRefBuilder | undefined;
+  private listeners: Set<TodosListener> = new Set();
 
   constructor(public db: Firestore) {}
 
   isReady(): this is ITodosBoxReady {
     return this.state === 'ready';
+  }
+
+  private notify(todos: TodoValues[]): void {
+    this.listeners.forEach((fn) => fn(todos, this.state));
   }
 
   initializeTodo(uid: string): void {
@@ -33,14 +38,10 @@ export class TodoBox implements ITodosBox {
 
     this.unsubscribeFn = onSnapshot(todosRef, (querySnapshot) => {
       // converterにデータ変換させているので余計なことはしない
-      this.todos = querySnapshot.docs.map((e) => e.data());
+      const todos = querySnapshot.docs.map((e) => e.data());
       this.state = 'ready';
+      this.notify(todos);
     });
-  }
-
-  // immutable強制にスライス返却
-  getTodos(): TodoValues[] | undefined {
-    return this.todos?.slice();
   }
 
   async add(todo: Omit<TodoValues, 'id'>): Promise<void> {
@@ -62,8 +63,18 @@ export class TodoBox implements ITodosBox {
     await deleteDoc(ref);
   }
 
+  // unmount時にコールすること
   unsubscribe(): void {
     this.unsubscribeFn?.();
     this.unsubscribeFn = undefined;
+  }
+
+  onChangeTodos(listener: TodosListener): () => void {
+    this.listeners.add(listener);
+
+    // unsubscribe 関数を返す
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 }
