@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { TodoValues } from 'src/TodoLogic/types/TodoTypes';
+import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 
 interface Props {
   todo: TodoValues;

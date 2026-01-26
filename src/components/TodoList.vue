@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { TodoValues } from 'src/TodoLogic/types/TodoTypes';
+import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 import TodoCard from './TodoCard.vue';
 
 interface Emits {

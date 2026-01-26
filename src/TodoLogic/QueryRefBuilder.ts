@@ -1,5 +1,4 @@
 import {
-  type Query,
   type Firestore,
   collection,
   type DocumentReference,

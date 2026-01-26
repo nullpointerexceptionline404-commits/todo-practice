@@ -15,7 +15,7 @@ export class TodoConverter implements ITodoConverter {
     modelObject: PartialWithFieldValue<TodoValues>,
     _: SetOptions,
   ): PartialWithFieldValue<TodoValues4DB>;
-  //　部分更新使る用Partialに
+  // 部分更新使る用Partialに
   //TODO: Overload
   toFirestore(
     modelObject: WithFieldValue<TodoValues> | PartialWithFieldValue<TodoValues>,

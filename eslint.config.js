@@ -78,8 +78,19 @@ export default defineConfigWithVueTs(
       },
     },
   },
+  // user config
   {
-    ignorePatterns: ['pseudo/**'],
+    ignores: ['pseudo/**'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
 
   prettierSkipFormatting,

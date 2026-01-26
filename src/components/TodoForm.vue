@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import TodoList from './TodoList.vue';
-import { TodoValues } from 'src/TodoLogic/types/TodoTypes';
+import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 import { TodoBox } from 'src/TodoLogic/TodoBox';
 import { useFirebase } from 'src/composables/useFirestore';
 
@@ -27,10 +27,6 @@ let offTodos: (() => void) | undefined;
 
 const uid = '';
 const isReady = computed(() => box.isReady());
-
-function makeTodo(id: number, content: string) {
-  return { id, content, done: false };
-}
 
 onMounted(() => {
   const { db } = useFirebase();
