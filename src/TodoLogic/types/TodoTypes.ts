@@ -82,6 +82,9 @@ export interface ITodosBox {
   // idとその他一つがあればOK
   // mergeオプションでやる
   update(target: TodoForUpdate): Promise<void>;
+  // 削除
+  // レコード特定にIDさえあればOK
+  remove(targetId: string): Promise<void>;
   // todosの購読解除処理
   unsubscribe(): void;
 }

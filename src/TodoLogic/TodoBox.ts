@@ -7,7 +7,7 @@ import type {
   TodoForUpdate,
   IQueryRefBuilder,
 } from './types/TodoTypes';
-import { addDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { addDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { QueryRefBuilder } from './QueryRefBuilder';
 
 export class TodoBox implements ITodosBox {
@@ -53,6 +53,13 @@ export class TodoBox implements ITodosBox {
     if (!this.isReady()) throw new Error('this is not ready');
     const ref = this.queryRefBuilder.pathOne(target.id);
     await updateDoc(ref, target);
+  }
+
+  async remove(id: string): Promise<void> {
+    if (!this.isReady()) throw new Error('this is not ready');
+
+    const ref = this.queryRefBuilder.pathOne(id);
+    await deleteDoc(ref);
   }
 
   unsubscribe(): void {
