@@ -12,16 +12,16 @@
 </template>
 
 <script setup lang="ts">
-import type { Todo } from './models';
+import { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 import TodoCard from './TodoCard.vue';
 
 interface Emits {
-  (e: 'remove', id: number): void;
-  (e: 'toggle-done', id: number, next: boolean): void;
+  (e: 'remove', id: string): void;
+  (e: 'toggle-done', id: string, next: boolean): void;
 }
 
 interface Props {
-  todos: Todo[];
+  todos: TodoValues[];
 }
 
 const emit = defineEmits<Emits>();
