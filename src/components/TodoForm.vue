@@ -1,9 +1,9 @@
 <template>
-  <q-form @submit="addTodo" @reset="reset">
+  <q-form @submit.prevent="addTodo" @reset="reset">
     <q-input v-model="todoText" autogrow></q-input>
     <q-btn type="submit">submit</q-btn>
     <q-btn type="reset">reset</q-btn>
-    <q-btn type="button" @click="reset2default">to default</q-btn>
+    <!-- <q-btn type="button" @click="reset2default">to default</q-btn> -->
   </q-form>
   <todo-list
     :todos="todos"
@@ -13,51 +13,64 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { Todo } from './models';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import TodoList from './TodoList.vue';
+import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
+import { TodoBox } from 'src/TodoLogic/TodoBox';
+import { useFirebase } from 'src/composables/useFirestore';
 
 const todoText = ref('');
+const todos = ref([] as TodoValues[]);
 
-function makeTodo(id: number, content: string): Todo {
-  return { id, content, done: false };
-}
+const box = new TodoBox();
+let offTodos: (() => void) | undefined;
 
-const defaultTodos: Todo[] = ['Todoアプリを作る', 'Quasarを勉強する'].map((e, i) => makeTodo(i, e));
+const uid = '';
+const isReady = computed(() => box.isReady());
 
-const todos = ref(defaultTodos);
+onMounted(() => {
+  const { db } = useFirebase();
 
-const maxId = computed(() => {
-  const ids = todos.value.map((e) => e.id);
-  return Math.max(...ids);
+  offTodos = box.onChangeTodos((nextTodos) => {
+    todos.value = nextTodos;
+  });
+
+  box.initializeTodo(db, uid);
 });
 
-function addTodo() {
-  const newTodo = makeTodo(maxId.value + 1, todoText.value);
+onBeforeUnmount(() => {
+  offTodos?.();
+  box.unsubscribe();
+});
+
+async function addTodo() {
+  const text = todoText.value.trim();
+  if (!text) return;
+  if (!isReady.value) return;
+
+  await box.add(text);
   todoText.value = '';
-  todos.value = [...todos.value, newTodo];
 }
 
-function removeTodo(targetId: number) {
-  const removed = todos.value.filter((e) => e.id !== targetId);
-  todos.value = removed;
+async function removeTodo(targetId: string) {
+  if (!box.isReady()) return;
+
+  await box.remove(targetId);
 }
 
 function reset() {
   todoText.value = '';
 }
 
-function reset2default() {
-  reset();
-  todos.value = defaultTodos;
-}
+// reset to default実装は後回し
+// function reset2default() {
+//   reset();
+//   todos.value = defaultTodos;
+// }
 
-function toggleDone(id: number, next: boolean) {
-  const nextTodos = todos.value.map((e) => {
-    if (e.id !== id) return e;
-    const toggled = { ...e, done: next };
-    return toggled;
-  });
-  todos.value = nextTodos;
+async function toggleDone(id: string, next: boolean) {
+  if (!box.isReady()) return;
+
+  await box.update({ id, done: next });
 }
 </script>

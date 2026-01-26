@@ -10,15 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Todo } from './models';
+import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 
 interface Props {
-  todo: Todo;
+  todo: TodoValues;
 }
 
 interface Emits {
-  (e: 'remove', todoId: number): void;
-  (e: 'toggle-done', id: number, next: boolean): void;
+  (e: 'remove', todoId: string): void;
+  (e: 'toggle-done', id: string, next: boolean): void;
 }
 
 const { todo } = defineProps<Props>();
