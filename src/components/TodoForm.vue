@@ -1,5 +1,5 @@
 <template>
-  <q-form @submit.prevent="addTodo" @reset.prevent="reset">
+  <q-form @submit.prevent="addTodo" @reset="reset">
     <q-input v-model="todoText" autogrow></q-input>
     <q-btn type="submit">submit</q-btn>
     <q-btn type="reset">reset</q-btn>
@@ -30,11 +30,12 @@ const isReady = computed(() => box.isReady());
 
 onMounted(() => {
   const { db } = useFirebase();
-  box.initializeTodo(db, uid);
 
   offTodos = box.onChangeTodos((nextTodos) => {
     todos.value = nextTodos;
   });
+
+  box.initializeTodo(db, uid);
 });
 
 onBeforeUnmount(() => {
