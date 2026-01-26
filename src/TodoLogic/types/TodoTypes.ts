@@ -55,8 +55,6 @@ export interface ITodosBox {
   state: DataState;
   // snapshot用
   // unsubscribeFn: (() => void) | undefined;
-  // クエリ投げる用
-  db: Firestore;
   // queryRefを作る
   // 全体の場合はキャッシュを作る
   queryRefBuilder: IQueryRefBuilder | undefined;
@@ -73,7 +71,7 @@ export interface ITodosBox {
   // ITodoDataを更新する処理
   // snapshot変更をリッスンしたときのコールバック
   // ここでステート変化も行う
-  initializeTodo(uid: string): void;
+  initializeTodo(db: Firestore, uid: string): void;
   // 追加
   // パラメータはすべて必要
   // ただしIDは払い出しのため要らない

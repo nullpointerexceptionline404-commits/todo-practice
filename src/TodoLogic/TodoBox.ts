@@ -17,8 +17,6 @@ export class TodoBox implements ITodosBox {
   queryRefBuilder: IQueryRefBuilder | undefined;
   private listeners: Set<TodosListener> = new Set();
 
-  constructor(public db: Firestore) {}
-
   isReady(): this is ITodosBoxReady {
     return this.state === 'ready';
   }
@@ -27,12 +25,12 @@ export class TodoBox implements ITodosBox {
     this.listeners.forEach((fn) => fn(todos, this.state));
   }
 
-  initializeTodo(uid: string): void {
+  initializeTodo(db: Firestore, uid: string): void {
     // 二重購読防止
     this.unsubscribe();
 
     // クエリ用
-    this.queryRefBuilder = new QueryRefBuilder(this.db, uid);
+    this.queryRefBuilder = new QueryRefBuilder(db, uid);
 
     const todosRef = this.queryRefBuilder.pathAll();
 
