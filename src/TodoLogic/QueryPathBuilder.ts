@@ -4,10 +4,11 @@ export class QueryPathBuilder implements IQueryPathBuilder {
   constructor(private uid: string) {}
 
   pathAll() {
-    return `/users/${this.uid}/todos`;
+    // return `/users/${this.uid}/todos`;
+    return `todos`;
   }
 
   pathOne(todoId: string) {
-    return `/users/${this.uid}/todos/${todoId}`;
+    return `todos/${todoId}`;
   }
 }
