@@ -6,7 +6,7 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
-import { useFirebase } from 'src/composables/useFirestore';
+import { authState } from 'src/boot/firebase';
 
 /*
  * If not building with SSR mode, you can
@@ -35,9 +35,9 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to) => {
-    const { auth } = useFirebase();
+    if (!authState.ready) return;
 
-    const hasLogined = auth.currentUser != null;
+    const hasLogined = authState.user != null;
 
     // meta.requiresAuth を見る
     if (to.meta.requiresAuth && !hasLogined) {
