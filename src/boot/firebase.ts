@@ -14,7 +14,7 @@ function getFirebaseConfig() {
   };
 }
 
-export default boot(async ({ urlPath, redirect }) => {
+export default boot(async () => {
   const fbApp = getApps().length ? getApp() : initializeApp(getFirebaseConfig());
 
   const db = getFirestore(fbApp);
@@ -34,16 +34,4 @@ export default boot(async ({ urlPath, redirect }) => {
   });
 
   await autoLoginPromise;
-
-  const isAuthorized = auth.currentUser != null;
-  const isLogingIn = urlPath.startsWith('/login');
-  const shouldLogin = !isAuthorized && !isLogingIn;
-  const shouldSkipLogin = isAuthorized && isLogingIn;
-
-  if (shouldLogin) {
-    redirect('/login');
-  }
-  if (shouldSkipLogin) {
-    redirect('/');
-  }
 });
