@@ -1,18 +1,7 @@
 import { boot } from 'quasar/wrappers';
-import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore';
-import type { Auth } from 'firebase/auth';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAuth, connectAuthEmulator, onAuthStateChanged } from 'firebase/auth';
-
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $firebase: {
-      app: FirebaseApp;
-      db: Firestore;
-      auth: Auth;
-    };
-  }
-}
 
 function getFirebaseConfig() {
   return {
@@ -25,7 +14,7 @@ function getFirebaseConfig() {
   };
 }
 
-export default boot(async ({ app, urlPath, redirect }) => {
+export default boot(async ({ urlPath, redirect }) => {
   const fbApp = getApps().length ? getApp() : initializeApp(getFirebaseConfig());
 
   const db = getFirestore(fbApp);
@@ -57,6 +46,4 @@ export default boot(async ({ app, urlPath, redirect }) => {
   if (shouldSkipLogin) {
     redirect('/');
   }
-
-  app.config.globalProperties.$firebase = { app: fbApp, db, auth };
 });
