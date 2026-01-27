@@ -1,12 +1,15 @@
 import { boot } from 'quasar/wrappers';
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore';
+import type { Auth } from 'firebase/auth';
+import { getAuth, connectAuthEmulator, onAuthStateChanged } from 'firebase/auth';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $firebase: {
       app: FirebaseApp;
       db: Firestore;
+      auth: Auth;
     };
   }
 }
@@ -22,17 +25,28 @@ function getFirebaseConfig() {
   };
 }
 
-export default boot(({ app }) => {
+export default boot(async ({ app }) => {
   const fbApp = getApps().length ? getApp() : initializeApp(getFirebaseConfig());
 
   const db = getFirestore(fbApp);
+  const auth = getAuth(fbApp);
 
   // 任意：ローカルエミュレータに接続（開発時だけ）
   if (import.meta.env.DEV) {
     // Firestore Emulator: localhost:8080
     connectFirestoreEmulator(db, 'localhost', 8080);
     // Functions Emulator: localhost:5001
+    connectAuthEmulator(auth, 'http://localhost:9099');
   }
 
-  app.config.globalProperties.$firebase = { app: fbApp, db };
+  const autoLoginPromise = new Promise<void>((resolve) => {
+    const off = onAuthStateChanged(auth, () => {
+      off();
+      resolve();
+    });
+  });
+
+  await autoLoginPromise;
+
+  app.config.globalProperties.$firebase = { app: fbApp, db, auth };
 });
