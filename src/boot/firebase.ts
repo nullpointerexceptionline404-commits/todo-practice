@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore';
-import type { Auth, User } from 'firebase/auth';
+import type { Auth } from 'firebase/auth';
 import { getAuth, connectAuthEmulator, onAuthStateChanged } from 'firebase/auth';
 
 declare module '@vue/runtime-core' {
@@ -25,12 +25,7 @@ function getFirebaseConfig() {
   };
 }
 
-export const authState = {
-  user: null as User | null,
-  ready: false,
-};
-
-export default boot(async ({ app }) => {
+export default boot(async ({ app, urlPath, redirect }) => {
   const fbApp = getApps().length ? getApp() : initializeApp(getFirebaseConfig());
 
   const db = getFirestore(fbApp);
@@ -38,22 +33,30 @@ export default boot(async ({ app }) => {
 
   // 任意：ローカルエミュレータに接続（開発時だけ）
   if (import.meta.env.DEV) {
-    // Firestore Emulator: localhost:8080
     connectFirestoreEmulator(db, 'localhost', 8080);
-    // Functions Emulator: localhost:5001
     connectAuthEmulator(auth, 'http://localhost:9099');
   }
 
   const autoLoginPromise = new Promise<void>((resolve) => {
-    const off = onAuthStateChanged(auth, (u) => {
-      authState.user = u;
-      authState.ready = true;
+    const off = onAuthStateChanged(auth, () => {
       off();
       resolve();
     });
   });
 
   await autoLoginPromise;
+
+  const isAuthorized = auth.currentUser != null;
+  const isLogingIn = urlPath.startsWith('/login');
+  const shouldLogin = !isAuthorized && !isLogingIn;
+  const shouldSkipLogin = isAuthorized && isLogingIn;
+
+  if (shouldLogin) {
+    redirect('/login');
+  }
+  if (shouldSkipLogin) {
+    redirect('/');
+  }
 
   app.config.globalProperties.$firebase = { app: fbApp, db, auth };
 });

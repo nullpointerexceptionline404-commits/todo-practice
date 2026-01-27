@@ -6,7 +6,6 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
-import { authState } from 'src/boot/firebase';
 
 /*
  * If not building with SSR mode, you can
@@ -32,23 +31,6 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
-  });
-
-  Router.beforeEach((to) => {
-    if (!authState.ready) return;
-
-    const hasLogined = authState.user != null;
-
-    // meta.requiresAuth を見る
-    if (to.meta.requiresAuth && !hasLogined) {
-      return { path: '/login', query: { redirect: to.fullPath } };
-    }
-    // ログイン済みなら /login は弾く
-    if (to.path === '/login' && hasLogined) {
-      return { path: '/' };
-    }
-
-    return true;
   });
 
   return Router;
