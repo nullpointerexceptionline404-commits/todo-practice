@@ -1,6 +1,6 @@
 {
   "name": "todo-practice",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A Quasar Project",
   "productName": "Todo practice",
   "author": "Yamaguchi Shunsuke <null.pointer.exception.line404@email.com>",
@@ -11,7 +11,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "dev:firebase": "firebase emulators:start --only firestore",
+    "dev:firebase": "firebase emulators:start --only firestore,auth,ui",
     "dev:func": "pnpm --filter functions... serve",
     "build": "quasar build",
     "postinstall": "quasar prepare"

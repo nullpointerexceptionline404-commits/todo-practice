@@ -17,7 +17,8 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import TodoList from './TodoList.vue';
 import type { TodoValues } from 'src/TodoLogic/types/TodoTypes';
 import { TodoBox } from 'src/TodoLogic/TodoBox';
-import { useFirebase } from 'src/composables/useFirestore';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const todoText = ref('');
 const todos = ref([] as TodoValues[]);
@@ -25,17 +26,18 @@ const todos = ref([] as TodoValues[]);
 const box = new TodoBox();
 let offTodos: (() => void) | undefined;
 
-const uid = '';
 const isReady = computed(() => box.isReady());
 
 onMounted(() => {
-  const { db } = useFirebase();
+  const db = getFirestore();
+  const { currentUser } = getAuth();
 
   offTodos = box.onChangeTodos((nextTodos) => {
     todos.value = nextTodos;
   });
 
-  box.initializeTodo(db, uid);
+  // ログイン済みでしか見ないので
+  box.initializeTodo(db, currentUser!.uid);
 });
 
 onBeforeUnmount(() => {

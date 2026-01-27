@@ -57,7 +57,13 @@ export class TodoBox implements ITodosBox {
   async update(target: TodoForUpdate) {
     if (!this.isReady()) throw new Error('this is not ready');
     const ref = this.queryRefBuilder.pathOne(target.id);
-    await updateDoc(ref, target);
+    // updateDocがconverterを通さないので手動で通す
+    const values = QueryRefBuilder.converter.toFirestore(
+      target,
+      // 本来ならいらないが、setDocに近い書き方をしておく
+      { merge: true },
+    );
+    await updateDoc(ref, values);
   }
 
   async remove(id: string): Promise<void> {
