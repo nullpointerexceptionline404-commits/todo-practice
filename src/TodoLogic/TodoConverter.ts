@@ -13,14 +13,14 @@ export class TodoConverter implements ITodoConverter {
   // merge / mergeFields 用（部分更新想定）オーバーロード
   toFirestore(
     modelObject: PartialWithFieldValue<TodoValues>,
-    _: SetOptions,
+    _?: SetOptions,
   ): PartialWithFieldValue<TodoValues4DB>;
   // 部分更新使る用Partialに
-  //TODO: Overload
   toFirestore(
     modelObject: WithFieldValue<TodoValues> | PartialWithFieldValue<TodoValues>,
+    _?: SetOptions,
   ): WithFieldValue<TodoValues4DB> | PartialWithFieldValue<TodoValues4DB> {
-    const { id: _, ...values } = modelObject;
+    const { id: _id, ...values } = modelObject;
     return values;
   }
 
