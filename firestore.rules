@@ -34,25 +34,29 @@ service cloud.firestore {
       return data.done is bool;
     }
 
-    match /users/{uid} {
+    match /tenants/{tenantId} {
       allow read, write: if false;
 
-      match /todos/{todoId} {
-        // 本人のサブコレクションのみ読み取り
-        allow get, list: if isSelf(uid);
+      match /users/{uid} {
+        allow read, write: if false;
 
-        allow create: if isSelf(uid)
-          && onlyTodoKeys(request.resource.data)
-          && validContent(request.resource.data)
-          && validDone(request.resource.data);
+        match /todos/{todoId} {
+          // 本人のサブコレクションのみ読み取り
+          allow get, list: if isSelf(uid);
 
-        allow update: if isSelf(uid)
-          && onlyTodoKeys(request.resource.data)
-          && validContent(request.resource.data)
-          && validDone(request.resource.data);
+          allow create: if isSelf(uid)
+            && onlyTodoKeys(request.resource.data)
+            && validContent(request.resource.data)
+            && validDone(request.resource.data);
 
-        // 削除：本人のみ
-        allow delete: if isSelf(uid);
+          allow update: if isSelf(uid)
+            && onlyTodoKeys(request.resource.data)
+            && validContent(request.resource.data)
+            && validDone(request.resource.data);
+
+          // 削除：本人のみ
+          allow delete: if isSelf(uid);
+        }
       }
     }
   }

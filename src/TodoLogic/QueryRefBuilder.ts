@@ -25,8 +25,9 @@ export class QueryRefBuilder implements IQueryRefBuilder {
   constructor(
     private db: Firestore,
     uid: string,
+    tenantId: string,
   ) {
-    this.pathBuilder = new QueryPathBuilder(uid);
+    this.pathBuilder = new QueryPathBuilder(uid, tenantId);
     const path = this.pathBuilder.pathAll();
     this.collectionPath = collection(db, path).withConverter(todoConverter);
   }

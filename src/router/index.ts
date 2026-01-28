@@ -36,7 +36,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to) => {
     const auth = getAuth();
-    const isAuthorized = auth.currentUser != null;
+    const isAuthorized = auth.currentUser != null && auth.currentUser.tenantId != null;
 
     const isLogin = to.path === '/login';
 

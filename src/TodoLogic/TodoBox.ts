@@ -28,12 +28,12 @@ export class TodoBox implements ITodosBox {
     this.listeners.forEach((fn) => fn(todos, this.state));
   }
 
-  initializeTodo(db: Firestore, uid: string): void {
+  initializeTodo(db: Firestore, uid: string, tenantId: string): void {
     // 二重購読防止
     this.unsubscribe();
 
     // クエリ用
-    this.queryRefBuilder = new QueryRefBuilder(db, uid);
+    this.queryRefBuilder = new QueryRefBuilder(db, uid, tenantId);
 
     const todosRef = this.queryRefBuilder.pathAll();
 

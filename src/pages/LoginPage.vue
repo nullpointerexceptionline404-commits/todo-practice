@@ -5,6 +5,7 @@
     <div>
       <q-form @submit.prevent="onLogin" class="column" style="gap: 2rem">
         <div class="column" style="gap: 1rem">
+          <q-select v-model="tenant" :options="options"></q-select>
           <q-input v-model="email" type="email" label="Email" />
           <q-input v-model="password" type="password" label="Password" />
         </div>
@@ -31,9 +32,11 @@ import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
+const options = ['tenant1', 'tenant2'];
 
 const email = ref('');
 const password = ref('');
+const tenant = ref('');
 const loading = ref(false);
 const error = ref<string | null>(null);
 
@@ -47,6 +50,7 @@ async function onLogin() {
   loading.value = true;
   try {
     const auth = getAuth();
+    auth.tenantId = tenant.value;
     await signInWithEmailAndPassword(auth, email.value, password.value);
     await router.replace(getRedirectPath());
   } catch (e) {
@@ -65,6 +69,7 @@ async function onSignup() {
   loading.value = true;
   try {
     const auth = getAuth();
+    auth.tenantId = tenant.value;
     await createUserWithEmailAndPassword(auth, email.value, password.value);
     await router.replace(getRedirectPath());
   } catch (e) {

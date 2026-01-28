@@ -1,13 +1,16 @@
 import type { IQueryPathBuilder } from './types/TodoTypes';
 
 export class QueryPathBuilder implements IQueryPathBuilder {
-  constructor(private uid: string) {}
+  constructor(
+    private uid: string,
+    private tenantId: string,
+  ) {}
 
   pathAll() {
-    return `/users/${this.uid}/todos`;
+    return `/tenants/${this.tenantId}/users/${this.uid}/todos`;
   }
 
   pathOne(todoId: string) {
-    return `/users/${this.uid}/todos/${todoId}`;
+    return `/tenants/${this.tenantId}/users/${this.uid}/todos/${todoId}`;
   }
 }
