@@ -3,9 +3,9 @@
     <p class="text-h6">Login</p>
 
     <div>
-      <q-form ref="formRef" @submit.prevent="onLogin" class="column" style="gap: 2rem">
+      <q-form ref="formRef" @submit.prevent="onSubmit" class="column" style="gap: 2rem">
         <div class="column" style="gap: 1rem">
-          <q-select v-model="tenant" :options="options" :rules="ruleRequired"></q-select>
+          <q-select v-model="tenant" :options="options" :rules="ruleRequired" />
           <q-input v-model="email" type="email" label="Email" :rules="ruleStringRequired" />
           <q-input
             v-model="password"
@@ -17,8 +17,21 @@
 
         <div class="column" style="gap: 1rem">
           <div class="row q-gutter-sm">
-            <q-btn type="submit" label="Login" :loading="loading" />
-            <q-btn type="button" label="Sign up" outline :disable="loading" @click="onSignup" />
+            <q-btn
+              type="submit"
+              label="Login"
+              :loading="loading"
+              :disable="loading"
+              value="signin"
+            />
+            <q-btn
+              type="submit"
+              label="Sign up"
+              outline
+              :loading="loading"
+              :disable="loading"
+              value="signup"
+            />
           </div>
 
           <div v-if="error" class="text-negative q-mt-md">
@@ -63,7 +76,17 @@ function getRedirectPath() {
   return typeof r === 'string' && r.length > 0 ? r : '/';
 }
 
-async function onLogin() {
+type SubmitAction = 'signin' | 'signup';
+
+function getSubmitAction(e: Event): SubmitAction {
+  // submit を発火させたボタン（HTML仕様）
+  const submitter = (e as SubmitEvent).submitter as HTMLButtonElement | null;
+
+  const v = submitter?.value;
+  return v === 'signup' ? 'signup' : 'signin'; // デフォルト signin
+}
+
+async function onSubmit(e: Event) {
   error.value = null;
 
   const ok = await formRef.value?.validate();
@@ -71,35 +94,23 @@ async function onLogin() {
 
   loading.value = true;
   try {
-    const auth = getAuth();
-    auth.tenantId = tenant.value;
-    await signInWithEmailAndPassword(auth, email.value.trim(), password.value.trim());
-    await router.replace(getRedirectPath());
-  } catch (e) {
-    if (e instanceof Error) {
-      error.value = e.message;
-    } else {
-      error.value = String(e);
-    }
-  } finally {
-    loading.value = false;
-  }
-}
+    const action = getSubmitAction(e);
 
-async function onSignup() {
-  error.value = null;
-  loading.value = true;
-  try {
     const auth = getAuth();
     auth.tenantId = tenant.value;
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
+
+    const mail = email.value.trim();
+    const pass = password.value.trim();
+
+    if (action === 'signup') {
+      await createUserWithEmailAndPassword(auth, mail, pass);
+    } else {
+      await signInWithEmailAndPassword(auth, mail, pass);
+    }
+
     await router.replace(getRedirectPath());
   } catch (e) {
-    if (e instanceof Error) {
-      error.value = e.message;
-    } else {
-      error.value = String(e);
-    }
+    error.value = e instanceof Error ? e.message : String(e);
   } finally {
     loading.value = false;
   }
