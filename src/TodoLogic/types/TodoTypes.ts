@@ -75,7 +75,7 @@ export interface ITodosBox {
   // ITodoDataを更新する処理
   // snapshot変更をリッスンしたときのコールバック
   // ここでステート変化も行う
-  initializeTodo(db: Firestore, uid: string): void;
+  initializeTodo(db: Firestore, uid: string, tenantId: string): void;
   // 追加
   // IDは払い出しのため要らない
   // doneもデフォルトはfalse

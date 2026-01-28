@@ -30,14 +30,16 @@ const isReady = computed(() => box.isReady());
 
 onMounted(() => {
   const db = getFirestore();
-  const { currentUser } = getAuth();
 
   offTodos = box.onChangeTodos((nextTodos) => {
     todos.value = nextTodos;
   });
 
+  const { currentUser } = getAuth();
+  const { uid, tenantId } = currentUser!;
+
   // ログイン済みでしか見ないので
-  box.initializeTodo(db, currentUser!.uid);
+  box.initializeTodo(db, uid, tenantId!);
 });
 
 onBeforeUnmount(() => {
